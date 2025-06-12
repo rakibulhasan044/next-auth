@@ -1,10 +1,12 @@
 "use client";
+import { loginUser } from "@/utils/actions/login";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
-type FormValues = {
+export type FormValues = {
   email: string;
   password: string;
 };
@@ -13,11 +15,26 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     formState: { errors },
   } = useForm<FormValues>();
 
+  const router = useRouter();
+
   const onSubmit = async (data: FormValues) => {
-    console.log(data);
+    // console.log(data);
+    try {
+          const res = await loginUser(data)
+          console.log(res);
+          if(res.accessToken) {
+            alert(res.message)
+            localStorage.setItem("accessToken", res.accessToken)
+            router.push('/')
+          }
+        } catch (err: any) {
+          console.error(err.message);
+          throw new Error(err.message);
+        }
   };
 
   return (
